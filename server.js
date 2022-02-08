@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const { errorHandler } = require('./middleware/errorHandler');
 
 const userRouter = require('./routers/userRouter');
 
@@ -12,6 +13,12 @@ const MONGODB_SERVER =
 
 const app = express();
 
+// To accept raw json data
+app.use(express.json());
+
+// To accept url encoded form data
+app.use(express.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'Welcome to the Help Desk server',
@@ -19,6 +26,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} in ${NODE_ENV} mode`);
