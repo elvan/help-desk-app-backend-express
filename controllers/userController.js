@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/userModel');
+const AppError = require('../errors/AppError');
 
 dotenv.config();
 
@@ -18,15 +19,14 @@ exports.registerUser = asyncHandler(async (req, res) => {
 
   // Simple validation
   if (!name || !email || !password) {
-    res.status(400);
-    throw new Error('Please provide all required fields');
+    throw new AppError('Please provide all required fields', 400);
   }
 
   // Check for existing user
   const user = await User.findOne({ email: email });
+
   if (user) {
-    res.status(400);
-    throw new Error('User already exists');
+    throw new AppError('User already exists', 400);
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -40,8 +40,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
   });
 
   if (!newUser) {
-    // If user is not created
-    throw new Error('User not created');
+    throw new AppError('User not created', 500);
   }
 
   res.status(200).json({
@@ -62,15 +61,13 @@ exports.loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    res.status(400);
-    throw new Error('User does not exist');
+    throw new AppError('User does not exist', 404);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    res.status(400);
-    throw new Error('Invalid email or password');
+    throw new AppError('Invalid email or password', 401);
   }
 
   res.status(200).json({
@@ -92,8 +89,7 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
   };
 
   if (!user) {
-    res.status(400);
-    throw new Error('User does not exist');
+    throw new AppError('User does not exist', 404);
   }
 
   res.status(200).json({
