@@ -1,0 +1,40 @@
+{
+  "name": "help-desk-app-backend-express",
+  "version": "0.17.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elvan/help-desk-app-backend-express.git"
+  },
+  "keywords": [],
+  "author": "Elvan Hidayat <elvanhd@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elvan/help-desk-app-backend-express/issues"
+  },
+  "homepage": "https://github.com/elvan/help-desk-app-backend-express#readme",
+  "engines": {
+    "node": "16.x",
+    "npm": "8.*"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.5",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "mongoose": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/express": "^4.17.13",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^16.11.22",
+    "nodemon": "^2.0.15"
+  }
+}
