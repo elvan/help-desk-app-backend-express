@@ -30,25 +30,45 @@ exports.registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
   });
 
-  if (newUser) {
-    res.status(200).json({
-      message: 'Register route is working',
-      user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-      },
-    });
+  if (!newUser) {
+    // If user is not created
+    throw new Error('User not created');
   }
 
-  // If user is not created
-  throw new Error('User not created');
+  res.status(200).json({
+    message: 'Register route is working',
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    },
+  });
 });
 
 // @route /api/users/login
 // @access Public
-exports.loginUser = asyncHandler((req, res) => {
+exports.loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    res.status(400);
+    throw new Error('User does not exist');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    res.status(400);
+    throw new Error('Invalid email or password');
+  }
+
   res.status(200).json({
     message: 'Login route is working',
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    },
   });
 });
