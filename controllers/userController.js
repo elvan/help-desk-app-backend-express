@@ -1,6 +1,13 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/userModel');
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'this is a secret';
 
 // @route /api/users/register
 // @access Public
@@ -36,11 +43,12 @@ exports.registerUser = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json({
-    message: 'Register route is working',
+    message: 'User created successfully',
     user: {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      token: generateToken(newUser._id),
     },
   });
 });
@@ -64,11 +72,16 @@ exports.loginUser = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json({
-    message: 'Login route is working',
+    message: 'User logged in successfully',
     user: {
       id: user._id,
       name: user.name,
       email: user.email,
+      token: generateToken(user._id),
     },
   });
 });
+
+const generateToken = (id) => {
+  return jwt.sign({ id: id }, JWT_SECRET, { expiresIn: '30d' });
+};
