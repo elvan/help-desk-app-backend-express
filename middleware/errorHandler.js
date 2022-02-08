@@ -7,9 +7,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 exports.errorHandler = (err, req, res, next) => {
   if (NODE_ENV === 'development') {
-    console.log(err);
-
     res.status(err.statusCode).json({
+      isError: true,
       error: err,
       message: err.message,
       stack: err.stack,
@@ -53,6 +52,7 @@ exports.errorHandler = (err, req, res, next) => {
     }
 
     res.status(error.statusCode).json({
+      isError: true,
       message: error.message || 'Internal Server Error',
     });
   }

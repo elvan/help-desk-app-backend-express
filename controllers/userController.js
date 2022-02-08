@@ -19,14 +19,17 @@ exports.registerUser = asyncHandler(async (req, res) => {
 
   // Simple validation
   if (!name || !email || !password) {
-    throw new AppError('Please provide all required fields', 400);
+    throw new AppError('Please provide all required fields.', 400);
   }
 
   // Check for existing user
   const user = await User.findOne({ email: email });
 
   if (user) {
-    throw new AppError('User already exists', 400);
+    throw new AppError(
+      'The email address is already in use by another account.',
+      400
+    );
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -40,11 +43,12 @@ exports.registerUser = asyncHandler(async (req, res) => {
   });
 
   if (!newUser) {
-    throw new AppError('User not created', 500);
+    throw new AppError('Can not create user.', 500);
   }
 
   res.status(200).json({
-    message: 'User created successfully',
+    isSuccess: true,
+    message: 'User created successfully.',
     user: {
       id: newUser._id,
       name: newUser.name,
@@ -61,17 +65,18 @@ exports.loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    throw new AppError('User does not exist', 404);
+    throw new AppError('User with this email does not exist.', 404);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new AppError('Invalid email or password', 401);
+    throw new AppError('Invalid email or password.', 401);
   }
 
   res.status(200).json({
-    message: 'User logged in successfully',
+    isSuccess: true,
+    message: 'User logged in successfully.',
     user: {
       id: user._id,
       name: user.name,
@@ -89,11 +94,12 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
   };
 
   if (!user) {
-    throw new AppError('User does not exist', 404);
+    throw new AppError('Can not fetch user information.', 404);
   }
 
   res.status(200).json({
-    message: 'Get current user successfully',
+    isSuccess: true,
+    message: 'User fetched successfully.',
     user: user,
   });
 });
