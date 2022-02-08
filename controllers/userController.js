@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
@@ -79,6 +81,24 @@ exports.loginUser = asyncHandler(async (req, res) => {
       email: user.email,
       token: generateToken(user._id),
     },
+  });
+});
+
+exports.getCurrentUser = asyncHandler(async (req, res) => {
+  const user = {
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+  };
+
+  if (!user) {
+    res.status(400);
+    throw new Error('User does not exist');
+  }
+
+  res.status(200).json({
+    message: 'Get current user successfully',
+    user: user,
   });
 });
 
