@@ -5,6 +5,7 @@ const { connectToDatabase } = require('./database/connect');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const userRouter = require('./routers/userRouter');
+const ticketRouter = require('./routers/ticketRouter');
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -48,6 +49,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/tickets', ticketRouter);
 
 app.use(errorHandler);
 
