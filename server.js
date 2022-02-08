@@ -1,6 +1,8 @@
 const dotenv = require('dotenv');
 const express = require('express');
 
+const userRouter = require('./routers/userRouter');
+
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
@@ -15,6 +17,8 @@ app.get('/', (req, res) => {
     message: 'Welcome to the Help Desk server',
   });
 });
+
+app.use('/api/users', userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} in ${NODE_ENV} mode`);
