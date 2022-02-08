@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
 const express = require('express');
+
+const { connectToDatabase } = require('./database/connect');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const userRouter = require('./routers/userRouter');
@@ -8,8 +10,8 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const MONGODB_SERVER =
-  process.env.MONGODB_SERVER || 'mongodb://localhost:27017';
+
+connectToDatabase();
 
 const app = express();
 
