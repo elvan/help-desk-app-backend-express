@@ -7,11 +7,7 @@ const User = require('../models/userModel');
 // @route GET /api/tickets
 // @access Protected
 exports.listTickets = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    throw new AppError('User not authenticated.', 401);
-  }
+  const user = await findUser(req.user.id);
 
   const tickets = await Ticket.find({ user: user._id });
 
@@ -35,11 +31,7 @@ exports.createTicket = asyncHandler(async (req, res) => {
     throw new AppError('Please provide product and description', 400);
   }
 
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    throw new AppError('User not authenticated.', 401);
-  }
+  const user = await findUser(req.user.id);
 
   const ticket = await Ticket.create({
     user: user._id,
@@ -60,21 +52,10 @@ exports.createTicket = asyncHandler(async (req, res) => {
 exports.getTicket = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
-  const user = await User.findById(req.user.id);
+  const user = await findUser(req.user.id);
+  const ticket = await findTicket(id);
 
-  if (!user) {
-    throw new AppError('User not authenticated.', 401);
-  }
-
-  const ticket = await Ticket.findById(id);
-
-  if (!ticket) {
-    throw new AppError('Ticket not found', 404);
-  }
-
-  if (ticket.user.toString() !== user._id.toString()) {
-    throw new AppError('User not authorized', 403);
-  }
+  verifyOwner(ticket, user);
 
   res.status(200).json({
     isSuccess: true,
@@ -89,21 +70,10 @@ exports.updateTicket = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const { product, description, status } = req.body;
 
-  const user = await User.findById(req.user.id);
+  const user = await findUser(req.user.id);
+  const ticket = await findTicket(id);
 
-  if (!user) {
-    throw new AppError('User not authenticated.', 401);
-  }
-
-  const ticket = await Ticket.findById(id);
-
-  if (!ticket) {
-    throw new AppError('Ticket not found', 404);
-  }
-
-  if (ticket.user.toString() !== user._id.toString()) {
-    throw new AppError('User not authorized', 403);
-  }
+  verifyOwner(ticket, user);
 
   ticket.product = product;
   ticket.description = description;
@@ -123,21 +93,10 @@ exports.updateTicket = asyncHandler(async (req, res) => {
 exports.deleteTicket = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
-  const user = await User.findById(req.user.id);
+  const user = await findUser(req.user.id);
+  const ticket = await findTicket(id);
 
-  if (!user) {
-    throw new AppError('User not authenticated.', 401);
-  }
-
-  const ticket = await Ticket.findById(id);
-
-  if (!ticket) {
-    throw new AppError('Ticket not found', 404);
-  }
-
-  if (ticket.user.toString() !== user._id.toString()) {
-    throw new AppError('User not authorized', 403);
-  }
+  verifyOwner(ticket, user);
 
   await ticket.remove();
 
@@ -146,3 +105,29 @@ exports.deleteTicket = asyncHandler(async (req, res) => {
     message: 'Ticket deleted successfully.',
   });
 });
+
+const findUser = async (id) => {
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new AppError('User not authenticated.', 401);
+  }
+
+  return user;
+};
+
+const findTicket = async (id) => {
+  const ticket = await Ticket.findById(id);
+
+  if (!ticket) {
+    throw new AppError('Ticket not found', 404);
+  }
+
+  return ticket;
+};
+
+const verifyOwner = async (ticket, user) => {
+  if (ticket.user.toString() !== user._id.toString()) {
+    throw new AppError('User not authorized', 403);
+  }
+};
